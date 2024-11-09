@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panier d'Achat</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .product {
+            margin-bottom: 10px;
+        }
+
+        #cart {
+            margin-top: 20px;
+            border-top: 1px solid #000;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Produits</h1>
+    <div id="product-list">
+        <div class="product">
+            <span>Produit A - $10.99</span>
+            <button onclick="addToCart(1, 'Produit A', 10.99)">Ajouter au Panier</button>
+        </div>
+        <div class="product">
+            <span>Produit B - $5.49</span>
+            <button onclick="addToCart(2, 'Produit B', 5.49)">Ajouter au Panier</button>
+        </div>
+        <div class="product">
+            <span>Produit C - $15.99</span>
+            <button onclick="addToCart(3, 'Produit C', 15.99)">Ajouter au Panier</button>
+        </div>
+    </div>
+
+    <div id="cart">
+        <h2>Panier d'Achat</h2>
+        <div id="cart-items"></div>
+        <div id="cart-summary">
+            <p>Total des éléments: <span id="total-items">0</span></p>
+            <p>Prix total: $<span id="total-price">0.00</span></p>
+        </div>
+    </div>
+
+    <script>
+        // Classes JavaScript ici
+
+        class Product {
+            constructor(id, name, price) {
+                this.id = id;
+                this.name = name;
+                this.price = price;
+            }
+        }
+
+        class ShoppingCartItem {
+            constructor(product, quantity) {
+                this.product = product;
+                this.quantity = quantity;
+            }
+
+            getTotalPrice() {
+                return this.product.price * this.quantity;
+            }
+        }
+
+        class ShoppingCart {
+            constructor() {
+                this.items = [];
+            }
+
+            getTotalItems() {
+                return this.items.reduce((total, item) => total + item.quantity, 0);
+            }
+
+            addItem(product, quantity) {
+                const item = this.items.find(i => i.product.id === product.id);
+                if (item) {
+                    item.quantity += quantity;
+                } else {
+                    this.items.push(new ShoppingCartItem(product, quantity));
+                }
+                this.updateCart();
+            }
+
+            removeItem(productId) {
+                this.items = this.items.filter(item => item.product.id !== productId);
+                this.updateCart();
+            }
+
+            displayItems() {
+                const cartItemsDiv = document.getElementById('cart-items');
+                cartItemsDiv.innerHTML = '';
+
+                this.items.forEach(item => {
+                    cartItemsDiv.innerHTML += `
+                        <div>${item.product.name}: ${item.quantity} x $${item.product.price.toFixed(2)} = $${item.getTotalPrice().toFixed(2)}
+                        <button onclick="removeFromCart(${item.product.id})">Supprimer</button></div>
+                    `;
+                });
+            }
+
+            getTotalPrice() {
+                return this.items.reduce((total, item) => total + item.getTotalPrice(), 0);
+            }
+
+            updateCart() {
+                this.displayItems();
+                document.getElementById('total-items').innerText = this.getTotalItems();
+                document.getElementById('total-price').innerText = this.getTotalPrice().toFixed(2);
+            }
+        }
+
+        const cart = new ShoppingCart();
+
+        function addToCart(id, name, price) {
+            const product = new Product(id, name, price);
+            cart.addItem(product, 1);
+        }
+
+        function removeFromCart(productId) {
+            cart.removeItem(productId);
+        }
+    </script>
+
+</body>
+
+</html>
